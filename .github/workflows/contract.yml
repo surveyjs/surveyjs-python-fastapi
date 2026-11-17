@@ -1,0 +1,155 @@
+# Checks that this repository still matches the integration docs (contract server-integration-v4): pytest (every
+# row of the SurveyJS service status mapping, mocked), the manifest and regions, the committed CSS, then the shared
+# contract test twice: without the service, and with it plus the AI stub. Between the two, the browser tests
+# (shared/browser-tests, Playwright and Chromium) run the example pages, and the smoke test runs once.
+# The tests job runs pytest and the check on Windows and Linux with Python 3.14 and 3.15; on Windows it also checks
+# shared/ against SHA256SUMS, which passes only because .gitattributes keeps LF line endings.
+# The image job builds the app's Docker image and starts it as docker-compose.yml does.
+name: Contract
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.14", "3.15"]
+    runs-on: ${{ matrix.os }}
+    name: pytest, Python ${{ matrix.python }} on ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Install
+        run: python -m pip install -r requirements-dev.txt
+
+      - name: Importing the app prints nothing, not even a deprecation warning
+        shell: bash
+        run: test -z "$(python -W error -c 'import app.main' 2>&1)"
+
+      - name: pytest (warnings are errors)
+        run: python -m pytest
+
+      - name: Manifest, regions, shared/ and pins
+        run: python -m scripts.check --complete
+
+  contract:
+    runs-on: ubuntu-latest
+    name: Contract, browser and smoke tests
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.15"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install
+        run: |
+          python -m pip install -r requirements-dev.txt
+          npm ci
+
+      - name: The committed stylesheet is the build of the templates
+        run: |
+          npm run css
+          git diff --exit-code static/css/site.css
+
+      - name: Contract test without the service
+        run: python -m scripts.contract
+        env:
+          SERVICE: "off"
+          AI: "off"
+
+      - name: Smoke test without the service
+        run: python -m scripts.contract --smoke
+        env:
+          SERVICE: "off"
+          AI: "off"
+
+      # host.js and page-tabs.js in a real browser: what pytest and the contract test never run.
+      # playwright.config.mjs starts `python serve.py` on port 8000 against a fresh DATA_DIR
+      - name: Browser tests (Chromium)
+        run: |
+          npx playwright install --with-deps chromium
+          npm run test:browser
+        env:
+          PYTHON: python
+
+      - name: Start the SurveyJS service and the AI stub
+        run: |
+          docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.ci.yml up -d --build surveyjs ai-stub
+          for i in $(seq 1 60); do
+            curl -sf -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:3010/schema > /dev/null && break
+            sleep 2
+          done
+
+      - name: Contract test with the service, the AI stub and the service switches
+        run: python -m scripts.contract
+        env:
+          SERVICE: "on"
+          AI: stub
+          VALIDATE_RESPONSES: "true"
+          LINT_DEFINITIONS: "true"
+          DEMO_MODE: "true"
+          AI_BASE_URL: http://127.0.0.1:3020/v1
+          AI_API_KEY: stub
+          AI_MODEL: stub
+
+      - name: Service logs
+        if: failure()
+        run: docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.ci.yml logs surveyjs ai-stub
+
+      - name: Browser test report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+  image:
+    runs-on: ubuntu-latest
+    name: Docker image
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and start the app (runtime requirements only, seeds on start)
+        run: docker compose up -d --build --no-deps app
+
+      - name: It answers
+        run: curl -sf --retry 30 --retry-delay 2 --retry-all-errors http://127.0.0.1:8000/up > /dev/null
+
+      - name: Behind a TLS proxy, the page's URLs are https and its relays wss
+        run: |
+          curl -sf -H 'X-Forwarded-Proto: https' -H 'Cookie: demo_user=alice' http://127.0.0.1:8000/examples/fill-together > page.html
+          grep -q '<link rel="canonical" href="https://127.0.0.1:8000/examples/fill-together">' page.html
+          grep -q '"fill": {"url": "wss://127.0.0.1:8000"' page.html
+          grep -q '"edit": {"url": "wss://127.0.0.1:8000"' page.html
+
+      - name: Production settings
+        run: |
+          docker compose exec -T app python -m app.settings | tee settings.txt
+          grep -q '^app_host=0.0.0.0$' settings.txt
+          grep -q '^forwarded_allow_ips=\*$' settings.txt
+          grep -q '^data_dir=/app/storage$' settings.txt
+          test "$(docker compose exec -T app id -u)" != "0"
+
+      - name: App logs
+        if: failure()
+        run: docker compose logs app

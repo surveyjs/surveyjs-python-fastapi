@@ -1,0 +1,14 @@
+# Project metadata and the pytest settings. This is an application, not an installable package:
+# its dependencies are in requirements.txt (runtime) and requirements-dev.txt (tests).
+[project]
+name = "surveyjs-python-fastapi"
+version = "1.0.0"
+description = "SurveyJS backend integration examples for Python and FastAPI"
+readme = "README.md"
+requires-python = ">=3.14"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# A deprecation warning is a test failure, on every supported Python
+filterwarnings = ["error"]
+addopts = "-p no:cacheprovider"
