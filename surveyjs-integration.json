@@ -4,7 +4,7 @@
   "framework": "fastapi",
   "repo": "surveyjs/surveyjs-python-fastapi",
   "branch": "main",
-  "surveyjsVersion": "3.2.3",
+  "surveyjsVersion": "3.2.7",
   "serverSideWorkflows": "service",
   "surveyjsService": "surveyjs/surveyjs-server@db1ac24b5f984511bbac463c890b6b0a3ebd2dc9",
   "steps": [
