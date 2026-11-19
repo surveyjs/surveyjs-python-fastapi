@@ -1,6 +1,7 @@
 """Shared test setup: a temporary DATA_DIR per test module, a seeded database, and TestClient(create_app(settings)).
 
-Every test builds its Settings explicitly, so neither .env nor the shell's environment changes what runs.
+Every test builds its Settings explicitly, so neither settings.env, .env nor the shell's environment changes
+what runs.
 """
 
 import sys

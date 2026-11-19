@@ -28,7 +28,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
-# Off means off: the app's .env must not switch translation or extraction on. A space overrides .env with nothing.
+# Off means off: the app's settings.env and .env must not switch translation or extraction on. A space overrides
+# them with nothing.
 AI_SETTINGS = ["AI_API_KEY", "SURVEYJS_AI_PROVIDER", "SURVEYJS_AI_MODEL", "SURVEYJS_OLLAMA_BASE_URL", "OPENAI_API_KEY",
                "ANTHROPIC_API_KEY"]
 SWITCHES = ["VALIDATE_RESPONSES", "LINT_DEFINITIONS", "DEMO_MODE"]
@@ -69,7 +70,7 @@ def main() -> int:
     env = {**os.environ, "DATA_DIR": str(data_dir), "APP_PORT": str(port), "APP_HOST": "127.0.0.1",
            "SERVICE": os.environ.get("SERVICE", "off"), "AI": os.environ.get("AI", "off"),
            "SURVEYJS_BUILD": os.environ.get("SURVEYJS_BUILD", "contract"), "PYTHONUNBUFFERED": "1"}
-    for switch in SWITCHES:   # what the test expects is what the app runs with, whatever .env says
+    for switch in SWITCHES:   # what the test expects is what the app runs with, whatever settings.env and .env say
         env[switch] = os.environ.get(switch) or "false"
     if env["AI"] != "stub":
         env.update({name: " " for name in AI_SETTINGS})

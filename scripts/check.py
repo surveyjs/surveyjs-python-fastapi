@@ -30,7 +30,7 @@ REGION_SOURCES = ["app/routes", "app/relay", "shared/client"]
 RELAY_FILES = ["app/routes/fill_together.py", "app/routes/edit_together.py"]
 MAX_REGION_LINES = 24
 MAX_RELAY_REGION_LINES = 60
-DOCS = "https://surveyjs.io/documentation/backend-integration-python"
+DOCS = "https://surveyjs.io/documentation/backend-integration-fastapi"
 # This platform's plumbing: a server region calls app/integration/ or app/db.py for these instead of showing them
 PLUMBING = ["sqlite3", "lastrowid", "json.dumps", "ensure_ascii", "httpx2", "TimeoutException", "ConnectError",
             "strftime", "isoformat"]

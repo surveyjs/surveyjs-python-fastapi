@@ -84,7 +84,7 @@ def test_the_layout_ids_one_docs_link_and_about_where_the_reference_renders_it(a
         for id in ids:
             assert f'id="{id}"' in html, f"{step['slug']}: #{id}"
         assert html.count(">Documentation</a>") == 1, step["slug"]
-        assert f'href="https://surveyjs.io/documentation/backend-integration-python#{step["anchor"]}"' in html
+        assert f'href="https://surveyjs.io/documentation/backend-integration-fastapi#{step["anchor"]}"' in html
         about = '<div class="space-y-2 text-sm text-gray-600">' in html
         assert about == (step["slug"] == "extract-from-paper"), f"{step['slug']}: the about block"
         assert ("require a developer license" in html) == step["licence"].startswith("Commercial"), step["slug"]

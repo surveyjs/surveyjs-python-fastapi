@@ -39,7 +39,7 @@ def git_build() -> str | None:
 
 
 def main() -> int:
-    from app.settings import Settings  # reads .env and the environment, nothing else
+    from app.settings import Settings  # reads settings.env, .env and the environment, nothing else
 
     settings = Settings()
     if port_answers(settings.app_port):

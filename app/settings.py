@@ -1,7 +1,9 @@
-"""Every setting, read once from the environment and .env. No other module reads os.environ.
+"""Every setting, read once from the environment, .env (the private keys) and settings.env (the rest, committed).
+No other module reads os.environ.
 
 create_app() builds one Settings and handlers get it through the SettingsDep dependency. Real
-environment variables win over .env, so Docker, CI and the contract runner can override any key.
+environment variables win over .env, and .env over settings.env, so Docker, CI and the contract runner can override
+any key.
 """
 
 import re
@@ -20,7 +22,7 @@ _SWITCH = re.compile(r"^(1|true|on|yes)$", re.IGNORECASE)
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=ROOT / ".env", env_file_encoding="utf-8", env_ignore_empty=True, extra="ignore")
+    model_config = SettingsConfigDict(env_file=(ROOT / "settings.env", ROOT / ".env"), env_file_encoding="utf-8", env_ignore_empty=True, extra="ignore")
 
     # Where the app listens. serve.py refuses a port something already answers on.
     app_port: int = 8000
@@ -62,7 +64,7 @@ class Settings(BaseSettings):
     surveyjs_build: str | None = None
 
     # Where the pages link: the docs (each example adds #<anchor>) and the repository (View on GitHub)
-    surveyjs_docs: str = "https://surveyjs.io/documentation/backend-integration-python"
+    surveyjs_docs: str = "https://surveyjs.io/documentation/backend-integration-fastapi"
     surveyjs_github: str = "https://github.com/surveyjs/surveyjs-python-fastapi"
 
     # uvicorn trusts X-Forwarded-For and X-Forwarded-Proto from these addresses (the Docker image: *)
