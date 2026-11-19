@@ -4,6 +4,7 @@
 name = "surveyjs-python-fastapi"
 version = "1.0.0"
 description = "SurveyJS backend integration examples for Python and FastAPI"
+license = "MIT"
 readme = "README.md"
 requires-python = ">=3.14"
 

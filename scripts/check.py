@@ -142,7 +142,7 @@ def check(complete: bool) -> list[str]:
     # ---- README: the prose links the docs page exactly twice (the generated table always holds it)
     prose = re.sub(r"<!-- steps:start[\s\S]*?<!-- steps:end -->", "", read("README.md"))
     links = [m.group(1) or m.group(2) for m in re.finditer(r"\]\((https?://[^)\s]+)\)|<(https?://[^>\s]+)>", prose)]
-    links = [url for url in links if url.startswith(DOCS) or re.match(r"https?://(www\.)?surveyjs\.io(/documentation)?/backend-integration", url)]
+    links = [url for url in links if url.startswith(DOCS) or re.match(r"https?://(www\.)?surveyjs\.io(/documentation)?/backend-integration(?!/examples)", url)]
     if len(links) != 2 or any(url != DOCS for url in links):
         errors.append(f"README.md must link to the docs exactly twice outside the example table, both to {DOCS}; found {len(links)}")
 

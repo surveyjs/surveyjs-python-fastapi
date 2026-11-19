@@ -3,7 +3,8 @@
 This is the Python code behind [Integrate SurveyJS with Python](https://surveyjs.io/documentation/backend-integration-fastapi), as a FastAPI application you can run example by example. Each example of that page has a page here that runs the real SurveyJS component against these routes, with a short "Try this" list, a live request log, a "What the server stored" panel and the code that just ran. SurveyJS has no backend of its own, so treat these as starting points for your own app.
 
 - SurveyJS demos: [app.demos.surveyjs.io](https://app.demos.surveyjs.io)
-- The same examples for other platforms: [PHP (Laravel)](https://github.com/surveyjs/surveyjs-php-laravel), [ASP.NET Core](https://github.com/surveyjs/surveyjs-aspnet-core), [Node.js (Express)](https://github.com/surveyjs/surveyjs-nodejs-express), [Next.js](https://github.com/surveyjs/surveyjs-nextjs), [Java (Spring Boot)](https://github.com/surveyjs/surveyjs-java-spring-boot)
+- Backend integration examples on the SurveyJS website: [surveyjs.io/backend-integration/examples](https://surveyjs.io/backend-integration/examples)
+- The same examples for other platforms: [PHP (Laravel)](https://github.com/surveyjs/surveyjs-php-laravel), [ASP.NET Core](https://github.com/surveyjs/surveyjs-aspnet-core), [Node.js (Express)](https://github.com/surveyjs/surveyjs-nodejs-express), [Python (Django)](https://github.com/surveyjs/surveyjs-python-django), [Next.js](https://github.com/surveyjs/surveyjs-nextjs), [Java (Spring Boot)](https://github.com/surveyjs/surveyjs-java-spring-boot)
 
 There is no hosted catalog for this repository yet.
 
@@ -258,7 +259,7 @@ def save_response():
     return jsonify(id=cursor.lastrowid), 201
 ```
 
-Only the request and response wrappers change. Django has its own SurveyJS example repository.
+Only the request and response wrappers change. Django has its own SurveyJS example repository: [surveyjs-python-django](https://github.com/surveyjs/surveyjs-python-django).
 
 ## Disclaimer
 
@@ -268,3 +269,9 @@ These examples must not be used as a real service as they are. They don't cover 
 - `get_current_user` in `app/auth.py`: the demo version reads a `demo_user` cookie; your app reads its session there, or uses an `OAuth2PasswordBearer` / JWT dependency. The relays take the same dependency.
 
 When you copy an example into your app, leave out the demo-only code: the `app/demo/` folder (and its lines in `app/main.py`), `app/pages.py`, `app/frontend.py`, `app/relay/room_key.py`'s sandbox keys, `templates/`, `shared/ui/` (the page frame, its tabs and highlighting, the fonts and site images) and `shared/client/host.js` (its `mountSurvey()` is one line: `renderSurvey(survey, element)` from `survey-js-ui`).
+
+## Licence
+
+The code in this repository is available under the [MIT licence](LICENSE).
+
+The examples use SurveyJS Form Library, which is MIT-licensed as well. The examples marked "Commercial" in the Licence column above also use SurveyJS Survey Creator, Dashboard or PDF Generator, which are commercial products. You can integrate them and evaluate their functionality without a licence. Production use requires a developer licence for each developer who works with the SurveyJS APIs or implements the integration. See the [SurveyJS Licensing FAQ](https://surveyjs.io/faq#licensing) and the [End-User License Agreement](https://surveyjs.io/Developer-License-Agreement.pdf).
