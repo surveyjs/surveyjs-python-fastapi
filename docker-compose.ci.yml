@@ -8,7 +8,9 @@ services:
         ports: ["127.0.0.1:3020:3020"]
 
     surveyjs:
+        # Under the app's names: docker-compose.yml's command exports AI_PROVIDER and OLLAMA_BASE_URL from these, so
+        # setting AI_PROVIDER here would be overwritten with settings.env's empty SURVEYJS_AI_PROVIDER
         environment:
-            AI_PROVIDER: ollama
-            OLLAMA_BASE_URL: http://ai-stub:3020
+            SURVEYJS_AI_PROVIDER: ollama
+            SURVEYJS_OLLAMA_BASE_URL: http://ai-stub:3020
         depends_on: [ai-stub]
