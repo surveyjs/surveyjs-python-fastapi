@@ -64,7 +64,7 @@ class Settings(BaseSettings):
     surveyjs_build: str | None = None
 
     # Where the pages link: the docs (each example adds #<anchor>) and the repository (View on GitHub)
-    surveyjs_docs: str = "https://surveyjs.io/documentation/backend-integration-fastapi"
+    surveyjs_docs: str = "https://surveyjs.io/documentation/backend-integration-python-fastapi"
     surveyjs_github: str = "https://github.com/surveyjs/surveyjs-python-fastapi"
 
     # uvicorn trusts X-Forwarded-For and X-Forwarded-Proto from these addresses (the Docker image: *)
